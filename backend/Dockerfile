@@ -4,8 +4,6 @@ WORKDIR /backend
 
 COPY . /backend
 
-RUN pip install torch --index-url https://download.pytorch.org/whl/cpu
-
 RUN pip install -r requirements.txt
 
 EXPOSE 8000
