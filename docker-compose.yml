@@ -7,8 +7,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "0.0.0.0:8000:8000"
+    volumes:
+      - frames-data:/data
 
   bot:
     build:
       context: "./bot"
       dockerfile: Dockerfile
+
+volumes:
+  frames-data:

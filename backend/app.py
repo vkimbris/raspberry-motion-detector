@@ -13,15 +13,13 @@ def read_root():
 
 @app.post("/receiveImage")
 def receive_image(frame: Frame):
-    save_frame_to_json(frame)
+    global CURRENT_FRAME
+    
+    CURRENT_FRAME = frame
     
     return {"status": "ok"}
 
 
 @app.get("/image")
 def get_image():
-    frame = load_frame_from_json()
-
-    print(frame)
-
-    return frame
+    return CURRENT_FRAME
