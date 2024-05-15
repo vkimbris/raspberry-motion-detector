@@ -1,4 +1,4 @@
-telebot
+streamlit
 numpy
 pillow
 requests

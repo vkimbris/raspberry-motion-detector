@@ -1,15 +1,30 @@
-import json
+import numpy as np
+import torch.nn.functional as F
 
+import torchvision.transforms as transforms
+
+from .motion_detector import MotionDetector
 from .models import Frame
 
+from typing import List
 
-def save_frame_to_json(frame: Frame) -> None:
-    with open("/data/last_frame.json", "w") as f:
-        json.dump(frame.dict(), f)
+from PIL import Image
 
 
-def load_frame_from_json() -> dict:
-    with open("/data/last_frame.json", "r") as f:
-        frame = json.load(f)
+convert_to_tensor = transforms.ToTensor()
 
-    return frame
+def predict(model: MotionDetector, frame: Frame) -> str:
+    frame = frame.frame
+
+    frame = np.array(frame)
+    frame = np.uint8(frame)
+
+    image = Image.fromarray(np.array(frame))
+    image = convert_to_tensor(image).transpose(1, 2)
+
+    output = model(image)
+    output = F.softmax(output, dim=-1)
+
+    print(output)
+
+    return output.argmax(dim=-1)[0].item()
