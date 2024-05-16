@@ -20,7 +20,9 @@ def predict(model: MotionDetector, frame: Frame) -> str:
     frame = np.uint8(frame)
 
     image = Image.fromarray(np.array(frame))
-    image = convert_to_tensor(image).transpose(1, 2)
+    image = convert_to_tensor(image).transpose(1, 2).unsqueeze(0)
+
+    print(image.shape)
 
     output = model(image)
     output = F.softmax(output, dim=-1)

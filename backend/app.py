@@ -10,9 +10,9 @@ app = FastAPI()
 
 
 motion_detector = MotionDetector()
-motion_detector.load_state_dict(torch.load("trained_models/motion_detector_v1"))
+motion_detector.load_state_dict(torch.load("trained_models/motion_detector_v2"))
 
-label2id = {0: 'Cидит', 1: 'Лежит', 2: 'Отсутствует'}
+label2id = {0: 'Отсутствует', 1: 'Лежит', 2: 'Сидит'}
 
 
 @app.get("/")
