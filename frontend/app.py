@@ -4,12 +4,14 @@ import requests
 import json
 import numpy as np
 
+from io import BytesIO
+
 from src.tools import *
 
 st.title('Ниже будет детектирована бабка')
 
-IMAGE_ENDPOINT = "http://backend:8000/image"
-CLASSIFY_ENDPOINT = "http://backend:8000/classify"
+FRAME_ENDPOINT = "http://backend:8000/frame"
+DETECT_ENDPOINT = "http://backend:8000/detect"
 
 
 image_placeholder = st.empty()
@@ -17,14 +19,10 @@ text_placeholder = st.empty()
 
 
 def render():
-    frame = get_request_to_backend(IMAGE_ENDPOINT)
-    label = get_request_to_backend(CLASSIFY_ENDPOINT)["label"]
+    frame, label = get_frame_from_backend(FRAME_ENDPOINT)
 
-    if len(frame["frame"]) > 0:
-        image = convert_frame_to_image(frame["frame"])
-
-        image_placeholder.image(image)
-        text_placeholder.text(f"Бабка {label}")
+    image_placeholder.image(frame)
+    text_placeholder.text("Есть" if label == 1 else "Отсутствует")
 
 
 while True:

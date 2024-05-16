@@ -1,18 +1,16 @@
 import torch
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, UploadFile, File, Response
 
-from src.models import Frame
 from src.tools import *
-from src.motion_detector import MotionDetector
+
+from PIL import Image
+from io import BytesIO
 
 app = FastAPI()
 
 
-motion_detector = MotionDetector()
-motion_detector.load_state_dict(torch.load("trained_models/motion_detector_v2"))
-
-label2id = {0: 'Отсутствует', 1: 'Лежит', 2: 'Сидит'}
+object_detector = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True)
 
 
 @app.get("/")
@@ -20,22 +18,21 @@ def read_root():
     return {"Hello": "World"}
 
 
-@app.post("/receiveImage")
-def receive_image(frame: Frame):
-    global CURRENT_FRAME
+@app.post("/receiveFrame")
+def receive_image(file: UploadFile = File(...)):    
+    global CURRENT_FRAME_IN_BYTES
+
+    frame_in_bytes = file.file.read()
     
-    CURRENT_FRAME = frame
+    CURRENT_FRAME_IN_BYTES = frame_in_bytes
     
     return {"status": "ok"}
 
 
-@app.get("/classify")
-def classification():
-    prediction = predict(motion_detector, CURRENT_FRAME)
-    
-    return {"label": label2id[prediction]}
-
-
-@app.get("/image")
+@app.get("/frame")
 def get_image():
-    return CURRENT_FRAME if CURRENT_FRAME is not None else {"frame": []}
+    label = predict(object_detector, CURRENT_FRAME_IN_BYTES)
+    
+    frame = Response(content=CURRENT_FRAME_IN_BYTES, media_type="image/png", headers={"label": str(label)})
+   
+    return frame

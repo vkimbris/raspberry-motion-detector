@@ -3,17 +3,16 @@ import requests
 import numpy as np
 
 from PIL import Image
+from io import BytesIO
 
-from typing import List
+from typing import Tuple
 
 
-def get_request_to_backend(endpoint: str):
+def get_frame_from_backend(endpoint: str):
     response = requests.get(url=endpoint)
 
-    return json.loads(response.text)
+    frame_bytes = response.content
+    label = response.headers["label"]
 
+    return Image.open(BytesIO(frame_bytes)), int(label)
 
-def convert_frame_to_image(frame: List[List[int]]):
-    image_array = np.array(frame, dtype=np.uint8)
-
-    return Image.fromarray(image_array).rotate(270)
