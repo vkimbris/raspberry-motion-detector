@@ -27,3 +27,4 @@ def render():
 
 while True:
     render()
+    time.sleep(1)
